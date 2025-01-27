@@ -880,7 +880,7 @@ app.get("/api/user-event/:eventId", async(req, res) => {
 })
 
 // getHomeEvents
-app.get("/api/home/:userId/events", authenticateUser , async (req, res) => {
+app.get("/api/home/:userId/events", async (req, res) => {
     const { userId } = req.params; 
   
     try {
@@ -888,7 +888,7 @@ app.get("/api/home/:userId/events", authenticateUser , async (req, res) => {
         where: { userIdFollows: userId, isActive: true },
         select: { userIdFollowedBy: true },
       });
-  
+
       const followingIds = following.map(f => f.userIdFollowedBy);
   
       let events;
@@ -924,10 +924,33 @@ app.get("/api/home/:userId/events", authenticateUser , async (req, res) => {
           return res.status(500).json({ error: "Failed to fetch events" });
         }
       } else {
+
         try {
           events = await db.event.findMany({
-            take: 10
+            take: 10, 
+            orderBy: { createdAt: "desc" }, 
+            include:{
+              socialInteractions: {
+                where: { userId: userId, isActive: true },
+                select: { isActive: true }
+              },
+              user: {
+              select:{
+                username: true, 
+                profileImage: true,
+                userId: true
+              }
+              }, 
+              location:{
+              select: {
+                latitude: true, 
+                longitude: true, 
+                locationId: true
+              }
+              }
+            }
           });
+
         } catch (error) {
           console.error("Error fetching events from liked categories:", error);
           return res.status(500).json({ error: "Failed to fetch events" });
