@@ -17,6 +17,17 @@ app.use((req, res, next) => {
   next(); 
 });
 
+app.get("/api", async(req, res)=>{
+  try{
+    res.json({
+      data: "Welcome to Eventify", 
+      success: true
+    })
+  }catch(error){
+    res.status(500).json({ error: "FAILED" });
+  }
+})
+
 // addLocation
 app.post("/api/locations", authenticateUser , async(req, res) => {
     const validationResult = locationSchema.safeParse(req.body);
