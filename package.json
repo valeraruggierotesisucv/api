@@ -9,7 +9,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start:dev": "nodemon server.js",
-    "build": "",
+    "start": "node server.js",
+    "build": "npx prisma generate --schema db/prisma/schema.prisma",
     "db:push": "npx prisma db push --schema db/prisma/schema.prisma",
     "db:generate": "npx prisma generate --schema db/prisma/schema.prisma",
     "db:migrate": "npx prisma migrate dev --schema db/prisma/schema.prisma --name db --",
@@ -27,9 +28,10 @@
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
-    "nodemon": "^3.1.9", 
+    "node": "^18.20.6",
+    "nodemon": "^3.1.9",
     "zod": "^3.24.1"
-  }, 
+  },
   "devDependencies": {
     "@types/node": "^22.10.2",
     "prisma": "^6.0.1",
