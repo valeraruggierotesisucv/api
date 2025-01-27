@@ -996,6 +996,7 @@ app.post("/api/signup", async (req, res) => {
           fullName,
           email,
           birthDate: new Date(birthDate),
+          profileImage: "https://crnarpvpafbywvdzfukp.supabase.co/storage/v1/object/public/DONT%20DELETE//defaultProfile.jpg"
         },
       });
   
