@@ -174,7 +174,7 @@ Content-Type: application/json
 }
 
 ### Send Notification
-POST http://localhost:5000/api/push-notifications/ExponentPushToken[xV4qAGHCCQjDDJN9R1s-g8]
+POST http://localhost:5000/api/push-notifications/crH6C_ceRIKl9UJxGKNnM1:APA91bE2fabAJk3hTkTxjwRFSxdmH--5Df0gVD14JGKcCS2QhcKD8e1CATHj2hYVtdjVBjKOlYHe4uVYmtgeiywNqmAE6TECd7kmLXISdkSTs8-MKyNg9jI
 Content-Type: application/json
 
 {

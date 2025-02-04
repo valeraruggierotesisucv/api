@@ -1,5 +1,6 @@
 const { likeEventSchema, commentEventSchema, signUpSchema, eventSchema, editProfileSchema, locationSchema, searchEventSchema, searchUserSchema } = require("./validationSchemas.js");
 const authenticateUser = require("./authenticateUser.js"); 
+const { JWT } = require('google-auth-library'); 
 const express = require("express");
 const cors = require("cors");
 const app = express();
@@ -27,6 +28,26 @@ app.get("/api", async(req, res)=>{
     res.status(500).json({ error: "FAILED" });
   }
 })
+
+// Función para obtener el access token
+function getAccessTokenAsync(key) {
+  return new Promise((resolve, reject) => {
+    const jwtClient = new JWT(
+      process.env.FIREBASE_CLIENT_EMAIL,
+      null,
+      process.env.FIREBASE_PRIVATE_KEY,
+      ['https://www.googleapis.com/auth/cloud-platform'],
+      null
+    );
+    jwtClient.authorize((err, tokens) => {
+      if (err) {
+        reject(err);
+        return;
+      }
+      resolve(tokens.access_token); 
+    });
+  });
+}
 
 // addLocation
 app.post("/api/locations", authenticateUser , async(req, res) => {
@@ -488,6 +509,7 @@ app.get("/api/users/:userId/push-notification", async(req, res) => {
     }
 })
 
+
 // updateUserNotificationToken
 app.put("/api/users/:userId/notifications/:notificationToken", async(req, res) => {
     try{
@@ -666,25 +688,35 @@ app.get("/api/users/:userId/followed", authenticateUser , async(req, res) => {
 // sendPushNotification
 app.post("/api/push-notifications/:notificationToken", async (req, res) => {
     try{
+      const firebaseAccessToken = await getAccessTokenAsync(process.env.FIREBASE_PRIVATE_KEY_ID); 
       const { notificationToken } = req.params; 
       const { title, body} = req.body; 
-      const message = {
-        to: notificationToken,
-        sound: "default",
-        title: title,
-        body: body,
+
+      const messageBody = {
+        message: {
+          token: notificationToken,
+          data: {
+            channelId: 'default',
+            message: body,
+            title: title,
+            body: JSON.stringify({ title: 'bodyTitle', body: 'bodyBody' }),
+          },
+        },
       };
   
-      await fetch("https://exp.host/--/api/v2/push/send", {
-        method: "POST",
-        headers: {
-          "host": "exp.host", 
-          "accept": "application/json",
-          "accept-encoding": "gzip, deflate",
-          "content-type": "application/json",
-        },
-        body: JSON.stringify(message),
-      });
+      await fetch(
+        `https://fcm.googleapis.com/v1/projects/${process.env.FIREBASE_PROJECT_ID}/messages:send`,
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${firebaseAccessToken}`,
+            Accept: 'application/json',
+            'Accept-encoding': 'gzip, deflate',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(messageBody),
+        }
+      );
       
       res.status(200).json({ message: "Notificacion enviada"})
     }catch(error){
