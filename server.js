@@ -457,7 +457,6 @@ app.get("/api/users/:userId/following", authenticateUser , async(req, res) => {
 app.get("/api/users/:userId/notifications", authenticateUser , async(req, res) => {
     try{
       const { userId } = req.params;  
-      console.log("GET USER NOTIFICATION")
       const notifications = await db.notification.findMany({
         where: {
           toUserId: userId
@@ -513,7 +512,6 @@ app.get("/api/users/:userId/push-notification", async(req, res) => {
 // updateUserNotificationToken
 app.put("/api/users/:userId/notifications/:notificationToken", async(req, res) => {
     try{
-      console.log("updateUserNotificationToken"); 
       const { userId, notificationToken } = req.params; 
   
       const user = await db.user.findFirst({
@@ -526,7 +524,7 @@ app.put("/api/users/:userId/notifications/:notificationToken", async(req, res) =
         console.log("No need to update ", notificationToken)
         res.status(200).json({ message: `No need to update ---> ${notificationToken}`})
       }else{
-        console.log("Token must be updated ", notificationToken); 
+        console.log("Token must be updated -->", notificationToken); 
         const userUpdated = await db.user.update({
           where: {
             userId: userId, 
@@ -911,6 +909,39 @@ app.get("/api/home/:userId/events", async (req, res) => {
                }
             }
           });
+
+          if(events.length <= 0){
+            try {
+              events = await db.event.findMany({
+                take: 10, 
+                orderBy: { createdAt: "desc" }, 
+                include:{
+                  socialInteractions: {
+                    where: { userId: userId, isActive: true },
+                    select: { isActive: true }
+                  },
+                  user: {
+                  select:{
+                    username: true, 
+                    profileImage: true,
+                    userId: true
+                  }
+                  }, 
+                  location:{
+                  select: {
+                    latitude: true, 
+                    longitude: true, 
+                    locationId: true
+                  }
+                  }
+                }
+              });
+    
+            } catch (error) {
+              console.error("Error fetching events", error);
+              return res.status(500).json({ error: "Failed to fetch events" });
+            }
+          }
         } catch (error) {
           console.error("Error fetching events from followed users:", error);
           return res.status(500).json({ error: "Failed to fetch events" });
@@ -944,7 +975,7 @@ app.get("/api/home/:userId/events", async (req, res) => {
           });
 
         } catch (error) {
-          console.error("Error fetching events from liked categories:", error);
+          console.error("Error fetching events", error);
           return res.status(500).json({ error: "Failed to fetch events" });
         }
       }
