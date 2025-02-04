@@ -457,7 +457,7 @@ app.get("/api/users/:userId/following", authenticateUser , async(req, res) => {
 app.get("/api/users/:userId/notifications", authenticateUser , async(req, res) => {
     try{
       const { userId } = req.params;  
-  
+      console.log("GET USER NOTIFICATION")
       const notifications = await db.notification.findMany({
         where: {
           toUserId: userId
@@ -513,6 +513,7 @@ app.get("/api/users/:userId/push-notification", async(req, res) => {
 // updateUserNotificationToken
 app.put("/api/users/:userId/notifications/:notificationToken", async(req, res) => {
     try{
+      console.log("updateUserNotificationToken"); 
       const { userId, notificationToken } = req.params; 
   
       const user = await db.user.findFirst({
