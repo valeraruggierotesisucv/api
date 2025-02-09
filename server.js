@@ -740,7 +740,7 @@ app.post("/api/notifications", authenticateUser, async(req, res) => {
           toUserId: toUserId, 
           type: type, 
           message: message, 
-          eventImage: eventImage? eventImage : undefined, 
+          eventImage: eventImage? eventImage : "https://crnarpvpafbywvdzfukp.supabase.co/storage/v1/object/public/DONT%20DELETE//defaultImage.jpg", 
         }
       })
   
