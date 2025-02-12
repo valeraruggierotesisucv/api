@@ -694,6 +694,10 @@ app.post("/api/push-notifications/:notificationToken", async (req, res) => {
       const messageBody = {
         message: {
           token: notificationToken,
+          notification: {
+            title: title,   
+            body: body      
+          },
           data: {
             channelId: 'default',
             message: body,
@@ -703,7 +707,7 @@ app.post("/api/push-notifications/:notificationToken", async (req, res) => {
         },
       };
   
-      await fetch(
+      const result = await fetch(
         `https://fcm.googleapis.com/v1/projects/${process.env.FIREBASE_PROJECT_ID}/messages:send`,
         {
           method: 'POST',
@@ -716,6 +720,8 @@ app.post("/api/push-notifications/:notificationToken", async (req, res) => {
           body: JSON.stringify(messageBody),
         }
       );
+
+      console.log("result-->", result); 
       
       res.status(200).json({ message: "Notificacion enviada"})
     }catch(error){
