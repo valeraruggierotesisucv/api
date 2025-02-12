@@ -709,7 +709,7 @@ app.post("/api/push-notifications/:notificationToken", async (req, res) => {
           },
         },
       };
-  
+      console.log(message); 
       const result = await fetch(
         `https://fcm.googleapis.com/v1/projects/${process.env.FIREBASE_PROJECT_ID}/messages:send`,
         {
