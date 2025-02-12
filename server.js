@@ -519,6 +519,9 @@ app.put("/api/users/:userId/notifications/:notificationToken", async(req, res) =
           userId: userId
         }
       })
+
+      console.log("updating...", userId); 
+      console.log("notificationToken"); 
   
       if(user.notificationToken === notificationToken){
         console.log("No need to update ", notificationToken)
